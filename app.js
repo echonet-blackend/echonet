@@ -1,5 +1,5 @@
 // ====== CONFIG ======
-const BACKEND_URL = "http://127.0.0.1:5000"; // change later to your Render URL
+const BACKEND_URL = "https://echonet-backend-nlc7.onrender.com"; // change later to your Render URL
 const API = `${BACKEND_URL}/api`;
 
 let authToken = localStorage.getItem("echonet_token") || null;
