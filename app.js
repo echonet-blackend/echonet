@@ -1,5 +1,5 @@
 // ====== CONFIG ======
-const BACKEND_URL = "https://echonet-backend-nlc7.onrender.com"; // change later to your Render URL
+const BACKEND_URL = "https://echonet-backend-nlc7.onrender.com"; // << CHANGE THIS
 const API = `${BACKEND_URL}/api`;
 
 let authToken = localStorage.getItem("echonet_token") || null;
@@ -7,13 +7,13 @@ let currentUser = null;
 
 // ====== DOM ELEMENTS ======
 const userControls = document.getElementById("userControls");
-const authModal = document.getElementById("authModal");
-const closeAuthModalBtn = document.getElementById("closeAuthModal");
+const authScreen = document.getElementById("authScreen");
 const loginTab = document.getElementById("loginTab");
 const registerTab = document.getElementById("registerTab");
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
 const authError = document.getElementById("authError");
+const continueGuestBtn = document.getElementById("continueGuest");
 
 const loginBtn = document.getElementById("loginBtn");
 const registerBtn = document.getElementById("registerBtn");
@@ -31,47 +31,31 @@ function showToast(msg) {
   setTimeout(() => toastEl.classList.add("hidden"), 2500);
 }
 
-function openAuthModal(mode = "login") {
-  authModal.classList.remove("hidden");
+function showAuthScreen() {
   authError.textContent = "";
-  if (mode === "register") {
-    loginTab.classList.remove("active");
-    registerTab.classList.add("active");
-    loginForm.classList.remove("active");
-    registerForm.classList.add("active");
-  } else {
-    loginTab.classList.add("active");
-    registerTab.classList.remove("active");
-    loginForm.classList.add("active");
-    registerForm.classList.remove("active");
-  }
+  authScreen.classList.remove("hidden");
 }
 
-function closeAuthModal() {
-  authModal.classList.add("hidden");
+function hideAuthScreen() {
+  authScreen.classList.add("hidden");
 }
 
 function setAuthToken(token) {
   authToken = token;
-  if (token) {
-    localStorage.setItem("echonet_token", token);
-  } else {
-    localStorage.removeItem("echonet_token");
-  }
+  if (token) localStorage.setItem("echonet_token", token);
+  else localStorage.removeItem("echonet_token");
 }
 
-// ====== API CALLS ======
+// ====== API WRAPPER ======
 async function apiRequest(path, options = {}) {
   const headers = options.headers || {};
   headers["Content-Type"] = "application/json";
-  if (authToken) {
-    headers["Authorization"] = `Bearer ${authToken}`;
-  }
-  const res = await fetch(`${API}${path}`, {
-    ...options,
-    headers,
-  });
-  const data = await res.json().catch(() => ({}));
+  if (authToken) headers["Authorization"] = `Bearer ${authToken}`;
+  const res = await fetch(`${API}${path}`, { ...options, headers });
+  let data = {};
+  try {
+    data = await res.json();
+  } catch (_) {}
   if (!res.ok) {
     const msg = data.error || `Error ${res.status}`;
     throw new Error(msg);
@@ -92,7 +76,7 @@ async function fetchCurrentUser() {
     const user = await apiRequest("/me", { method: "GET" });
     currentUser = user;
   } catch (err) {
-    console.error(err);
+    console.error("me error:", err.message);
     setAuthToken(null);
     currentUser = null;
   }
@@ -117,7 +101,7 @@ async function handleLogin() {
     });
     setAuthToken(data.token);
     currentUser = data.user;
-    closeAuthModal();
+    hideAuthScreen();
     renderUserControls();
     renderProfileCard();
     renderCreatePostCard();
@@ -146,7 +130,7 @@ async function handleRegister() {
     });
     setAuthToken(data.token);
     currentUser = data.user;
-    closeAuthModal();
+    hideAuthScreen();
     renderUserControls();
     renderProfileCard();
     renderCreatePostCard();
@@ -167,10 +151,7 @@ async function loadFeed() {
       return;
     }
     feedEl.innerHTML = "";
-    posts.forEach((p) => {
-      const postEl = renderPost(p);
-      feedEl.appendChild(postEl);
-    });
+    posts.forEach((p) => feedEl.appendChild(renderPost(p)));
   } catch (err) {
     feedEl.innerHTML = `<p class="muted center">Failed to load feed: ${err.message}</p>`;
   }
@@ -226,17 +207,13 @@ function renderPost(post) {
     </div>
   `;
 
-  // Autoplay when in view
   const video = wrapper.querySelector("video");
   if (video) {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            video.play().catch(() => {});
-          } else {
-            video.pause();
-          }
+          if (entry.isIntersecting) video.play().catch(() => {});
+          else video.pause();
         });
       },
       { threshold: 0.6 }
@@ -254,12 +231,15 @@ function renderUserControls() {
     const loginBtn = document.createElement("button");
     loginBtn.className = "secondary-btn";
     loginBtn.textContent = "Log in";
-    loginBtn.onclick = () => openAuthModal("login");
+    loginBtn.onclick = () => showAuthScreen();
 
     const registerBtn = document.createElement("button");
     registerBtn.className = "primary-btn";
     registerBtn.textContent = "Sign up";
-    registerBtn.onclick = () => openAuthModal("register");
+    registerBtn.onclick = () => {
+      showAuthScreen();
+      switchAuthMode("register");
+    };
 
     userControls.appendChild(loginBtn);
     userControls.appendChild(registerBtn);
@@ -286,6 +266,7 @@ function renderUserControls() {
       renderProfileCard();
       renderCreatePostCard();
       showToast("Logged out");
+      showAuthScreen();
     };
 
     userControls.appendChild(avatarBtn);
@@ -312,7 +293,7 @@ function renderProfileCard() {
       <h2>${currentUser.display_name}</h2>
       <div class="username">@${currentUser.username}</div>
       <p class="profile-bio">${currentUser.bio || "No bio yet."}</p>
-      <button id="editProfileBtn" class="secondary-btn" style="margin-top:8px;">Edit profile</button>
+      <button id="editProfileBtn" class="secondary-btn" style="margin-top:8px;">Edit profile (local)</button>
     </div>
   `;
 
@@ -365,37 +346,51 @@ async function handleCreatePost() {
   }
 }
 
-// Very simple profile edit (local only for now; backend endpoints can be added later)
+// local-only profile editor for now
 function openProfileEditor() {
   if (!currentUser) return;
   const bio = prompt("Bio:", currentUser.bio || "");
   if (bio === null) return;
   currentUser.bio = bio;
   renderProfileCard();
-  showToast("Bio updated (local only – can wire to backend later).");
+  showToast("Bio updated (local only – backend endpoint can be added later).");
+}
+
+// ====== AUTH TABS ======
+function switchAuthMode(mode) {
+  if (mode === "login") {
+    loginTab.classList.add("active");
+    registerTab.classList.remove("active");
+    loginForm.classList.add("active");
+    registerForm.classList.remove("active");
+  } else {
+    loginTab.classList.remove("active");
+    registerTab.classList.add("active");
+    loginForm.classList.remove("active");
+    registerForm.classList.add("active");
+  }
 }
 
 // ====== EVENT LISTENERS ======
-loginTab.addEventListener("click", () => openAuthModal("login"));
-registerTab.addEventListener("click", () => openAuthModal("register"));
-closeAuthModalBtn.addEventListener("click", closeAuthModal);
+loginTab.addEventListener("click", () => switchAuthMode("login"));
+registerTab.addEventListener("click", () => switchAuthMode("register"));
 
 loginBtn.addEventListener("click", handleLogin);
 registerBtn.addEventListener("click", handleRegister);
 
-authModal.addEventListener("click", (e) => {
-  if (e.target === authModal) closeAuthModal();
+continueGuestBtn.addEventListener("click", () => {
+  hideAuthScreen();
+  showToast("Browsing as guest – log in to post.");
 });
 
-// Simple search placeholder
 searchInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    showToast("Search is cosmetic for now – backend search can be added.");
-  }
+  if (e.key === "Enter") showToast("Search is cosmetic for now.");
 });
 
 // ====== INIT ======
 (async function init() {
   await fetchCurrentUser();
   await loadFeed();
+  // show login screen if not logged in
+  if (!currentUser) showAuthScreen();
 })();
