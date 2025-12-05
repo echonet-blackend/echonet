@@ -15,31 +15,56 @@
         <input type="text" id="searchInput" placeholder="Search creators..." />
       </div>
       <div class="user-controls" id="userControls">
-        <!-- Filled by JS (login/register buttons or avatar) -->
+        <!-- Filled by JS -->
       </div>
     </header>
 
-    <!-- AUTH MODAL -->
-    <div id="authModal" class="modal hidden">
-      <div class="modal-content">
-        <span id="closeAuthModal" class="close">&times;</span>
-        <div class="auth-tabs">
-          <button id="loginTab" class="auth-tab active">Log in</button>
-          <button id="registerTab" class="auth-tab">Sign up</button>
+    <!-- TIKTOK-STYLE AUTH SCREEN -->
+    <div id="authScreen" class="auth-screen hidden">
+      <div class="auth-panel">
+        <div class="auth-left">
+          <div class="auth-phone-frame">
+            <div class="auth-phone-video">
+              <div class="auth-phone-overlay">
+                <div class="auth-phone-logo">EchoNet</div>
+                <p>Watch creators, gamers & artists in a vertical feed.</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div id="loginForm" class="auth-form active">
-          <input id="loginUsername" type="text" placeholder="Username or email" />
-          <input id="loginPassword" type="password" placeholder="Password" />
-          <button id="loginBtn" class="primary-btn">Log in</button>
+        <div class="auth-right">
+          <div class="auth-brand">
+            <span class="auth-mini-logo">◎</span>
+            <span>EchoNet</span>
+          </div>
+          <h2>Log in to EchoNet</h2>
+          <p class="auth-sub">Join the creator feed for gamers, music artists and editors.</p>
+
+          <div class="auth-tabs">
+            <button id="loginTab" class="auth-tab active">Log in</button>
+            <button id="registerTab" class="auth-tab">Sign up</button>
+          </div>
+
+          <div id="loginForm" class="auth-form active">
+            <input id="loginUsername" type="text" placeholder="Username or email" />
+            <input id="loginPassword" type="password" placeholder="Password" />
+            <button id="loginBtn" class="primary-btn full">Log in</button>
+          </div>
+
+          <div id="registerForm" class="auth-form">
+            <input id="regUsername" type="text" placeholder="Username" />
+            <input id="regEmail" type="email" placeholder="Email" />
+            <input id="regDisplayName" type="text" placeholder="Display name" />
+            <input id="regPassword" type="password" placeholder="Password" />
+            <button id="registerBtn" class="primary-btn full">Create account</button>
+          </div>
+
+          <div id="authError" class="error-msg"></div>
+
+          <div class="auth-footer">
+            <button id="continueGuest" class="text-btn">Continue without logging in</button>
+          </div>
         </div>
-        <div id="registerForm" class="auth-form">
-          <input id="regUsername" type="text" placeholder="Username" />
-          <input id="regEmail" type="email" placeholder="Email" />
-          <input id="regDisplayName" type="text" placeholder="Display name" />
-          <input id="regPassword" type="password" placeholder="Password" />
-          <button id="registerBtn" class="primary-btn">Sign up</button>
-        </div>
-        <div id="authError" class="error-msg"></div>
       </div>
     </div>
 
@@ -48,11 +73,10 @@
       <!-- LEFT SIDEBAR (PROFILE / SETTINGS) -->
       <aside class="sidebar left">
         <div id="profileCard" class="profile-card">
-          <!-- Filled by JS -->
           <p class="muted">Log in to edit your profile.</p>
         </div>
         <div class="create-post-card" id="createPostCard">
-          <!-- Only when logged in -->
+          <!-- Filled by JS when logged in -->
         </div>
       </aside>
 
@@ -63,19 +87,18 @@
         </div>
       </section>
 
-      <!-- RIGHT SIDEBAR (SUGGESTED / INFO) -->
+      <!-- RIGHT SIDEBAR (INFO) -->
       <aside class="sidebar right">
         <div class="info-card">
           <h3>What is EchoNet?</h3>
-          <p>A creator-first mini network for gamers, music artists and content creators.</p>
-          <p>Post vertical videos, images or short thoughts.</p>
+          <p>A TikTok-style mini network for creators, gamers and music artists.</p>
         </div>
         <div class="info-card">
-          <h3>Tips</h3>
+          <h3>Posting tips</h3>
           <ul>
-            <li>Use .mp4 / .webm URLs for videos.</li>
-            <li>Use image links (jpg, png, gif) for thumbnails.</li>
-            <li>Keep posts vertical for TikTok-style vibes.</li>
+            <li>Use direct .mp4 URLs for videos.</li>
+            <li>Use tall / vertical clips for the best look.</li>
+            <li>Use image URLs (jpg/png/gif) for static posts.</li>
           </ul>
         </div>
       </aside>
