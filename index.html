@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>EchoNet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- HEADER -->
+    <header class="top-bar">
+      <div class="logo">EchoNet</div>
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search creators..." />
+      </div>
+      <div class="user-controls" id="userControls">
+        <!-- Filled by JS (login/register buttons or avatar) -->
+      </div>
+    </header>
+
+    <!-- AUTH MODAL -->
+    <div id="authModal" class="modal hidden">
+      <div class="modal-content">
+        <span id="closeAuthModal" class="close">&times;</span>
+        <div class="auth-tabs">
+          <button id="loginTab" class="auth-tab active">Log in</button>
+          <button id="registerTab" class="auth-tab">Sign up</button>
+        </div>
+        <div id="loginForm" class="auth-form active">
+          <input id="loginUsername" type="text" placeholder="Username or email" />
+          <input id="loginPassword" type="password" placeholder="Password" />
+          <button id="loginBtn" class="primary-btn">Log in</button>
+        </div>
+        <div id="registerForm" class="auth-form">
+          <input id="regUsername" type="text" placeholder="Username" />
+          <input id="regEmail" type="email" placeholder="Email" />
+          <input id="regDisplayName" type="text" placeholder="Display name" />
+          <input id="regPassword" type="password" placeholder="Password" />
+          <button id="registerBtn" class="primary-btn">Sign up</button>
+        </div>
+        <div id="authError" class="error-msg"></div>
+      </div>
+    </div>
+
+    <!-- MAIN LAYOUT -->
+    <main class="layout">
+      <!-- LEFT SIDEBAR (PROFILE / SETTINGS) -->
+      <aside class="sidebar left">
+        <div id="profileCard" class="profile-card">
+          <!-- Filled by JS -->
+          <p class="muted">Log in to edit your profile.</p>
+        </div>
+        <div class="create-post-card" id="createPostCard">
+          <!-- Only when logged in -->
+        </div>
+      </aside>
+
+      <!-- CENTER FEED -->
+      <section class="feed-container">
+        <div id="feed" class="feed">
+          <p class="muted center">Loading feed...</p>
+        </div>
+      </section>
+
+      <!-- RIGHT SIDEBAR (SUGGESTED / INFO) -->
+      <aside class="sidebar right">
+        <div class="info-card">
+          <h3>What is EchoNet?</h3>
+          <p>A creator-first mini network for gamers, music artists and content creators.</p>
+          <p>Post vertical videos, images or short thoughts.</p>
+        </div>
+        <div class="info-card">
+          <h3>Tips</h3>
+          <ul>
+            <li>Use .mp4 / .webm URLs for videos.</li>
+            <li>Use image links (jpg, png, gif) for thumbnails.</li>
+            <li>Keep posts vertical for TikTok-style vibes.</li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+
+    <!-- TOAST / NOTIFICATION -->
+    <div id="toast" class="toast hidden"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
